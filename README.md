@@ -155,6 +155,6 @@ npm run dev
 
 ## Built As
 
-A hiring assessment for Rippling's Support Ops team. The brief asked for a prototype that could ingest a headcount model and accurately answer questions without hallucinating. The architecture was designed to make hallucination structurally impossible — not just unlikely.
+A hiring assessment for a Senior AI Program Manager role for a company with a large global customer support team. The brief asked for a prototype that could ingest a headcount model and accurately answer questions without hallucinating. The architecture was designed to make hallucination structurally impossible, not just unlikely.
 
-Built in one evening using Claude Code. Planned using a structured five-phase product and engineering framework before any code was written.
+Built and deployed in less than a day using Claude Code. Planned using a structured five-phase product and engineering framework before any code was written.
