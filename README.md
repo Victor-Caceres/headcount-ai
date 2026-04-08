@@ -22,6 +22,38 @@ This makes the system trustworthy by design, not by instruction. Every number in
 
 ---
 
+## Try It
+
+The tool understands plain English questions about the headcount model. You don't need to use specific phrasing — ask naturally.
+
+**The model covers three regions:** NAMER, EMEA, and APAC, each with their own active agent count, average handle time (AHT), and projected ticket volume.
+
+**Global assumptions** apply across all regions: working hours per month, shrinkage rate, and utilization target.
+
+### Example questions
+
+**Data retrieval**
+> "How many active agents do we currently have in EMEA, and what is our assumed shrinkage rate?"
+
+**Capacity calculation**
+> "Based on our current metrics, what is the maximum number of tickets our NAMER team can handle next month?"
+
+**What-if scenario**
+> "If ticket volume in APAC increases by 30% and handle time increases by 2 minutes, how many net-new agents do we need to hire?"
+
+**Utilization check**
+> "What utilization rate is EMEA currently running at given their projected volume?"
+
+**Staffing gap**
+> "Are we overstaffed or understaffed in NAMER next month?"
+
+**Global view**
+> "Give me a full staffing gap analysis across all regions."
+
+The tool will tell you clearly if a question falls outside the model's scope — costs, attrition rates, historical trends, and similar inputs aren't in this dataset.
+
+---
+
 ## How It Works
 
 ```
@@ -117,44 +149,23 @@ headcount-ai/
 
 ---
 
-## Running Locally
+## Running Your Own Instance
 
-**Backend**
-```bash
-cd backend
-pip install -r requirements.txt
-```
+The live version at [headcount-ai.vercel.app](https://headcount-ai.vercel.app) is the intended entry point. If you want to run a local instance or fork the project with your own data model, you'll need:
 
-Create `backend/.env`:
-```
-ANTHROPIC_API_KEY=your_key_here
-SUPABASE_URL=your_url_here
-SUPABASE_SERVICE_KEY=your_key_here
-```
+- Anthropic API key
+- Supabase project with the three tables seeded (schema in `db.py`)
+- `backend/.env` with `ANTHROPIC_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`
+- `frontend/.env.local` with `VITE_API_URL=http://localhost:8000`
 
-```bash
-python -m uvicorn main:app --reload
-```
+Backend: `pip install -r requirements.txt` → `python -m uvicorn main:app --reload`
 
-**Frontend**
-```bash
-cd frontend
-npm install
-```
-
-Create `frontend/.env.local`:
-```
-VITE_API_URL=http://localhost:8000
-```
-
-```bash
-npm run dev
-```
+Frontend: `npm install` → `npm run dev`
 
 ---
 
 ## Built As
 
-A hiring assessment for Rippling's Support Ops team. The brief asked for a prototype that could ingest a headcount model and accurately answer questions without hallucinating. The architecture was designed to make hallucination structurally impossible — not just unlikely.
+A hiring assessment for a Senior AI Program Manager role at a company with a large global customer support team. The brief asked for a prototype that could ingest a headcount model and accurately answer questions without hallucinating. The architecture was designed to make hallucination structurally impossible - not just unlikely.
 
-Built in one evening using Claude Code. Planned using a structured five-phase product and engineering framework before any code was written.
+Built and deployed in hours using Claude Code. Planned using a structured five-phase product and engineering framework before any code was written (see: https://victorcaceres.com/thefineprint/how-i-work#:~:text=Planning%20Before%20Doing).
