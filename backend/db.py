@@ -12,6 +12,8 @@ HEADERS = {
     "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
 }
 
+_ALL_TABLES = {"global_assumptions", "roster", "projected_tickets"}
+
 
 def _fetch(table: str) -> list[dict]:
     url = f"{SUPABASE_URL}/rest/v1/{table}?select=*"
@@ -20,25 +22,43 @@ def _fetch(table: str) -> list[dict]:
     return resp.json()
 
 
-def get_model_data() -> dict:
-    raw_global = _fetch("global_assumptions")
-    raw_roster = _fetch("roster")
-    raw_tickets = _fetch("projected_tickets")
+def _resolve(param, all_sentinel) -> set | None:
+    """Return None (fetch all) or a set of values to include."""
+    if not param or param == [all_sentinel]:
+        return None
+    return set(param)
 
-    global_assumptions = {row["key"]: row["value"] for row in raw_global}
 
-    roster = {
-        row["region"]: {
-            "agents": row["agents"],
-            "aht_minutes": row["aht_minutes"],
+def get_model_data(regions=None, tables=None) -> dict:
+    active_regions = _resolve(regions, "ALL")
+    active_tables = _resolve(tables, "ALL")
+
+    # global_assumptions is always fetched
+    tables_to_fetch = _ALL_TABLES if active_tables is None else (active_tables | {"global_assumptions"})
+
+    result = {}
+
+    if "global_assumptions" in tables_to_fetch:
+        raw_global = _fetch("global_assumptions")
+        result["global_assumptions"] = {row["key"]: row["value"] for row in raw_global}
+
+    if "roster" in tables_to_fetch:
+        raw_roster = _fetch("roster")
+        result["roster"] = {
+            row["region"]: {
+                "agents": row["agents"],
+                "aht_minutes": row["aht_minutes"],
+            }
+            for row in raw_roster
+            if active_regions is None or row["region"] in active_regions
         }
-        for row in raw_roster
-    }
 
-    projected_tickets = {row["region"]: row["tickets"] for row in raw_tickets}
+    if "projected_tickets" in tables_to_fetch:
+        raw_tickets = _fetch("projected_tickets")
+        result["projected_tickets"] = {
+            row["region"]: row["tickets"]
+            for row in raw_tickets
+            if active_regions is None or row["region"] in active_regions
+        }
 
-    return {
-        "global_assumptions": global_assumptions,
-        "roster": roster,
-        "projected_tickets": projected_tickets,
-    }
+    return result
